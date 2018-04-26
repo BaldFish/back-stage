@@ -5,6 +5,7 @@
 </template>
 
 <script>
+  import "./common/stylus/index.styl";
   export default {
     name: 'App'
   }

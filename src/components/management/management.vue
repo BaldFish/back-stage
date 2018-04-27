@@ -21,7 +21,8 @@
               <el-radio-button :label="false">展开</el-radio-button>
               <el-radio-button :label="true">收起</el-radio-button>
             </el-radio-group>
-            <el-menu default-active="2-1" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose" :collapse="isCollapse">
+            <el-menu default-active="2-3" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose" :collapse="isCollapse"
+                     unique-opened>
               <el-submenu index="1">
                 <template slot="title">
                   <i class="el-icon-setting"></i>
@@ -39,13 +40,13 @@
                 </template>
                 <el-menu-item-group>
                   <el-menu-item index="2-1">
-                    <router-link to="/management/categoryList">分类管理列表</router-link>
+                    <router-link to="/management/2-1">分类管理列表</router-link>
                   </el-menu-item>
                   <el-menu-item index="2-2">
-                    <router-link to="/management/articleList">文章管理列表</router-link>
+                    <router-link to="/management/2-2">文章管理列表</router-link>
                   </el-menu-item>
                   <el-menu-item index="2-3">
-                    <router-link to="/management/">增加文章</router-link>
+                    <router-link to="/management/2-3">增加文章</router-link>
                   </el-menu-item>
                 </el-menu-item-group>
               </el-submenu>
@@ -81,7 +82,11 @@ export default {
 
 <style scoped lang="stylus">
   a{
-  
+    color #303133
+  }
+  a.router-link-active{
+    color #409EFF
+    text-decoration: none;
   }
 .el-header {
   text-align: right;

@@ -24,17 +24,17 @@ export default new Router({
           component: addArticle
         },
         {
-          path: 'addArticle',
+          path: '2-3',
           name: 'addArticle',
           component: addArticle
         },
         {
-          path: 'categoryList',
+          path: '2-1',
           name: 'categoryList',
           component: categoryList
         },
         {
-          path: 'articleList',
+          path: '2-2',
           name: 'articleList',
           component: articleList
         },

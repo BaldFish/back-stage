@@ -3,7 +3,7 @@
     <a href="/#/management/2-2/">
       <h3>返回列表</h3>
     </a>
-    <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+    <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm" size="medium">
       <el-form-item label="类型：" prop="region">
         <el-select v-model="ruleForm.region" placeholder="请选择文章类型" style="width: 200px;">
           <el-option label="新闻" value="xinwen"></el-option>
@@ -41,17 +41,69 @@
         <el-button type="primary" @click="submitForm('ruleForm')">确定</el-button>
         <el-button @click="resetForm('ruleForm')">重置</el-button>
       </el-form-item>
+      <el-form-item label="上传图片:">
+        
+        <el-upload action="http://wallet-api-test.launchain.org:50000/v1/file" list-type="picture-card"
+                   :on-preview="handlePictureCardPreview"
+                    :on-remove="handleRemove" :headers="bb" name="uploadfile">
+          <i class="el-icon-plus"></i>
+          <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+        </el-upload>
+        <el-dialog :visible.sync="dialogVisible">
+          <img width="100%" :src="dialogImageUrl" alt>
+        </el-dialog>
+        <el-row>
+          <el-col :span="6">
+            <div class="grid-content bg-purple-dark">
+              <img :src="a" alt="选择的图片" style="height:145px;width:200px;display: block;margin-bottom: 10px" >
+              <input style="width: 130px;" type="text"  :value="a" id="contents"/>
+              <el-button style="width: 60px; padding: 10px 5px" type="primary" round @click="jsCopy">复制</el-button>
+            </div>
+          </el-col>
+          <el-col :span="18">
+            <ul>
+              <li style="display: inline-block;height: 145px;width: 200px">123123</li>
+              <li style="display: inline-block;height: 145px;width: 200px">123123</li>
+              <li style="display: inline-block;height: 145px;width: 200px">123123</li>
+              <li style="display: inline-block;height: 145px;width: 200px">123123</li>
+              <li style="display: inline-block;height: 145px;width: 200px">123123</li>
+              <li style="display: inline-block;height: 145px;width: 200px">123123</li>
+              <li style="display: inline-block;height: 145px;width: 200px">123123</li>
+              <li style="display: inline-block;height: 145px;width: 200px">123123</li>
+              <li style="display: inline-block;height: 145px;width: 200px">123123</li>
+              <li style="display: inline-block;height: 145px;width: 200px">123123</li>
+              <li style="display: inline-block;height: 145px;width: 200px">123123</li>
+              <li style="display: inline-block;height: 145px;width: 200px">123123</li>
+              <li style="display: inline-block;height: 145px;width: 200px">123123</li>
+              <li style="display: inline-block;height: 145px;width: 200px">123123</li>
+              <li style="display: inline-block;height: 145px;width: 200px">123123</li>
+              <li style="display: inline-block;height: 145px;width: 200px">123123</li>
+            </ul>
+          </el-col>
+        </el-row>
+      </el-form-item>
     </el-form>
+    <form>
+      <input type="file" name="uploadfile">
+      <button @click="ccc">3453454</button>
+    </form>
+    
   </div>
 </template>
 
 <script>
 import UE from "../../components/ue/ue.vue";
-
+import axios from "axios";
+import _ from "lodash";
 export default {
   components: { UE },
   data() {
     return {
+      bb:{
+        "X-Access-Token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MjU1MDk0NTIsInVzZXJfaWQiOiJPYmplY3RJZEhleChcIjVhYzlkZTBjNWRiZmMzMDAwMWQ1N2YyNFwiKSIsImRldmljZV9pZCI6IjY0ZmY4Zjg0LTRhYmYtMTFlOC05ZDEzLTAyNDJhYzExMDAwMyJ9.MUKh_h6XlaBcxoFv6JhsHwb4DV42OdkSFmyeaQXLy3I",
+        'Content-Type':'multipart/form-data'
+      },
+      a: "http://cn.cdblockchain.io/static/img/2.7b2154d.jpg",
       ruleForm: {
         region: "",
         name: "",
@@ -84,10 +136,24 @@ export default {
       config: {
         initialFrameWidth: null,
         initialFrameHeight: 350
-      }
+      },
+      dialogImageUrl: "",
+      dialogVisible: false
     };
   },
   methods: {
+    ccc(){
+      axios({
+        method: "post",
+        url:"http://wallet-api-test.launchain.org:50000/v1/file",
+        contentType: "multipart/form-data",
+        headers:{
+          "X-Access-Token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MjU1MTU0NTIsInVzZXJfaWQiOiJPYmplY3RJZEhleChcIjVhYzlkZTBjNWRiZmMzMDAwMWQ1N2YyNFwiKSIsImRldmljZV9pZCI6IjVjZDA1NzZmLTRhY2QtMTFlOC05ZDEzLTAyNDJhYzExMDAwMyJ9.N3tjeaQMs-hcpaAQiyvYKlCZxBbSeMi1nRrsVld9l30",
+        },
+      }).then(res=>{
+        console.log(res)
+      })
+    },
     submitForm(formName) {
       this.getUEContent();
       this.$refs[formName].validate(valid => {
@@ -111,10 +177,36 @@ export default {
       //   type: "success"
       // });
       console.log(this.ruleForm.desc);
+    },
+    handleRemove(file, fileList) {
+      console.log(file, fileList);
+    },
+    handlePictureCardPreview(file) {
+      this.dialogImageUrl = file.url;
+      this.dialogVisible = true;
+    },
+    jsCopy() {
+      var e = document.getElementById("contents"); //对象是contents
+      e.select(); //选择对象
+      document.execCommand("Copy"); //执行浏览器复制命令
     }
-  }
+  },
+  mounted(){
+    // axios({
+    //   method: "GET",
+    //   url: "http://wallet-api-test.launchain.org:50000/v1/broadcast/search?type=show_type",
+    //   headers:{
+    //
+    //   }
+    // }).then(res=>{
+    //   console.log(res)
+    // })
+  },
 };
 </script>
 
-<style scoped lang="stylus">
+<style lang="stylus">
+/*input[type=file] {
+  display: none;
+}*/
 </style>

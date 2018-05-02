@@ -20,13 +20,7 @@ export default new Router({
       children: [
         {
           path: '',
-          name: 'addArticle',
-          component: addArticle
-        },
-        {
-          path: '2-3',
-          name: 'addArticle',
-          component: addArticle
+          redirect:"2-3",
         },
         {
           path: '2-1',
@@ -37,6 +31,11 @@ export default new Router({
           path: '2-2',
           name: 'articleList',
           component: articleList
+        },
+        {
+          path: '2-3',
+          name: 'addArticle',
+          component: addArticle
         },
       ]
     },

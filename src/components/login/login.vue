@@ -111,7 +111,7 @@ export default {
         })
           .then(res => {
             that.loginInfo = res.data;
-            localStorage.setItem("myLogin", JSON.stringify(res.data));
+            sessionStorage.setItem("myLogin", JSON.stringify(res.data));
             that.$layer.alert("登陆成功！", {
               shadeClose: false,
               title: "提示框"
@@ -121,12 +121,11 @@ export default {
             });
             location.href = "/#/management";
             console.log(that.loginInfo);
-            console.log(localStorage.myLogin);
+            console.log(sessionStorage.myLogin);
           })
           .catch(error => {
             if (error.response) {
               // 请求已发出，但服务器响应的状态码不在 2xx 范围内
-              console.log(typeof error.response.data);
               that.$layer.alert(error.response.data.code, {
                 shadeClose: false,
                 title: "提示框"

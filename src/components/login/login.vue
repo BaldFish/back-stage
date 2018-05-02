@@ -120,8 +120,6 @@ export default {
               val = "";
             });
             location.href = "/#/management";
-            console.log(that.loginInfo);
-            console.log(sessionStorage.myLogin);
           })
           .catch(error => {
             if (error.response) {

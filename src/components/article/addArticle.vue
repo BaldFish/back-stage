@@ -4,9 +4,9 @@
       <h3>返回列表</h3>
     </a>
     <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm" size="medium">
-      <el-form-item label="类型：" prop="category_name">
-        <el-select v-model="ruleForm.category_name" placeholder="请选择文章类型" style="width: 200px;">
-          <el-option v-for="(item,index) of article_type" :label=item.Name :value=item.Code :key="index"></el-option>
+      <el-form-item label="类型：" prop="category_code">
+        <el-select v-model="ruleForm.category_code" placeholder="请选择文章类型" style="width: 200px;" @change="changeValue">
+          <el-option v-for="(item,index) of article_type" :label=item.Name :value=item.Code :key="item.Code" ></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="文章标题：" prop="title">
@@ -24,8 +24,8 @@
       </el-form-item>
       <el-form-item label="状态：" prop="essay_status">
         <el-radio-group v-model="ruleForm.essay_status">
-          <el-radio label="有效" value="1"></el-radio>
-          <el-radio label="无效" value="2"></el-radio>
+          <el-radio :label=1>有效</el-radio>
+          <el-radio :label=2>无效</el-radio>
         </el-radio-group>
       </el-form-item>
       <el-form-item label="内容：" prop="content">
@@ -73,6 +73,7 @@
 <script>
 import UE from "../../components/ue/ue.vue";
 import axios from "axios";
+import formatDate from "@/common/js/formatDate.js";
 import _ from "lodash";
 export default {
   components: { UE },
@@ -97,7 +98,7 @@ export default {
         delivery: false
       },
       rules: {
-        category_name: [{ required: true, message: "请选择类型", trigger: "change" }],
+        category_code: [{ required: true, message: "请选择类型", trigger: "change" }],
         title: [
           { required: true, message: "请输入文章标题", trigger: "blur" },
           { min: 1, max: 50, message: "长度在 1 到 50 个字符", trigger: "blur" }
@@ -125,6 +126,13 @@ export default {
     };
   },
   methods: {
+    changeValue(){
+      var that=this;
+      var select_article_type=_.find(this.article_type,function (o) {
+        return o.Code===that.ruleForm.category_code
+      });
+      this.ruleForm.category_name=select_article_type.Name;
+    },
     getImgUrl() {
       this.select_imgUrl = event.target.src;
     },
@@ -133,9 +141,17 @@ export default {
       this.$refs[formName].validate(valid => {
         if (valid) {
           console.log(this.token);
+          this.ruleForm.show_time=formatDate(
+            new Date(this.ruleForm.show_time),
+            "yyyy-MM-dd"
+          );
+          console.log(typeof this.ruleForm.show_time);
+          // this.ruleForm.show_time=Date.parse(this.ruleForm.show_time);
+          // console.log(typeof this.ruleForm.show_time);
+          // this.ruleForm.show_time=new Date(this.ruleForm.show_time);
           var data={
             category_name:this.ruleForm.category_name,
-            category_code: "",
+            category_code:this.ruleForm.category_code,
             title:this.ruleForm.title,
             show_time: this.ruleForm.show_time,
             picture_url:this.ruleForm.picture_url,
@@ -143,24 +159,17 @@ export default {
             content:this.ruleForm.content,
           }
           console.log(data)
-          // axios({
-          //   method:'post',
-          //   url: "http://wallet-api-test.launchain.org:50000/v1/essay",
-          //   headers:{
-          //     'Content-Type': 'application/x-www-form-urlencoded',
-          //     'X-Access-Token':this.token,
-          //   },
-          //   data:{
-          //     category_name:'',
-          //     category_code:'',
-          //     title:'',
-          //     show_time:'',
-          //     picture_url:'',
-          //     essay_status:'',
-          //     content:'',
-          //   },
-          // }).then()
-          alert("submit!");
+          axios({
+            method:'post',
+            url: "http://wallet-api-test.launchain.org:50000/v1/essay",
+            headers:{
+              'Content-Type': 'application/x-www-form-urlencoded',
+              'X-Access-Token':this.token,
+            },
+            data:data,
+          }).then(res=>{
+            console.log(res)
+          })
         } else {
           console.log("error submit!!");
           return false;
@@ -195,8 +204,8 @@ export default {
     }
   },
   mounted() {
-    this.token=JSON.parse(sessionStorage.myLogin).token,
-      console.log(typeof sessionStorage.myLogin)
+    this.token=JSON.parse(sessionStorage.myLogin).token;
+    //console.log(this.token);
     //获取下拉列表文章类型
     axios({
       method: "GET",
@@ -205,7 +214,6 @@ export default {
     })
       .then(res => {
         this.article_type = res.data.info;
-        console.log(res)
       })
       .catch(error => {
         this.article_type = [];
@@ -217,7 +225,6 @@ export default {
     })
       .then(res => {
         this.img_list = res.data.info;
-        console.log(this.img_list);
       })
       .catch(error => {
         this.img_list = [];

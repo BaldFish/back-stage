@@ -55,7 +55,6 @@ export default {
         code: "",
         pngId: ""
       },
-      loginInfo: ""
     };
   },
   mounted: function() {
@@ -70,7 +69,6 @@ export default {
       }).then(res => {
         this.pngInfo = "data:image/png;base64," + res.data.png;
         this.formLabelAlign.pngId = res.data.captcha_id;
-        console.log(this.formLabelAlign.pngId);
       });
     },
     register: function() {
@@ -110,7 +108,6 @@ export default {
           data: registerInfo
         })
           .then(res => {
-            that.loginInfo = res.data;
             sessionStorage.setItem("myLogin", JSON.stringify(res.data));
             that.$layer.alert("登陆成功！", {
               shadeClose: false,
@@ -128,14 +125,13 @@ export default {
                 shadeClose: false,
                 title: "提示框"
               });
-              // console.log(error.response.data);
-              // console.log(error.response.status);
-              // console.log(error.response.headers);
             } else {
               // Something happened in setting up the request that triggered an Error
-              console.log("Error", error.message);
+              that.$layer.alert(error.message, {
+                shadeClose: false,
+                title: "提示框"
+              });
             }
-            // console.log(error.config);
           });
       }
     }

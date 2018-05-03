@@ -93,7 +93,7 @@ export default {
         title: "",
         show_time: "",
         picture_url: "",
-        essay_status: "",
+        essay_status: 0,
         content:"",
         delivery: false
       },
@@ -140,25 +140,12 @@ export default {
       this.getUEContent();
       this.$refs[formName].validate(valid => {
         if (valid) {
-          console.log(this.token);
           this.ruleForm.show_time=formatDate(
             new Date(this.ruleForm.show_time),
             "yyyy-MM-dd"
           );
-          console.log(typeof this.ruleForm.show_time);
-          // this.ruleForm.show_time=Date.parse(this.ruleForm.show_time);
-          // console.log(typeof this.ruleForm.show_time);
-          // this.ruleForm.show_time=new Date(this.ruleForm.show_time);
-          var data={
-            category_name:this.ruleForm.category_name,
-            category_code:this.ruleForm.category_code,
-            title:this.ruleForm.title,
-            show_time: this.ruleForm.show_time,
-            picture_url:this.ruleForm.picture_url,
-            essay_status:this.ruleForm.essay_status,
-            content:this.ruleForm.content,
-          }
-          console.log(data)
+          var
+            data="category_name="+this.ruleForm.category_name+"&category_code="+this.ruleForm.category_code+"&title="+this.ruleForm.title+"&show_time="+this.ruleForm.show_time+"&picture_url="+this.ruleForm.picture_url+"&essay_status="+this.ruleForm.essay_status+"&content="+this.ruleForm.content;
           axios({
             method:'post',
             url: "http://wallet-api-test.launchain.org:50000/v1/essay",
@@ -168,27 +155,33 @@ export default {
             },
             data:data,
           }).then(res=>{
-            console.log(res)
+            this.$layer.alert("新增成功！", {
+              shadeClose: false,
+              title: "提示框"
+            });
           })
         } else {
-          console.log("error submit!!");
+          this.$layer.alert("新增失败！", {
+            shadeClose: false,
+            title: "提示框"
+          });
           return false;
         }
       });
     },
-    resetForm(formName) {
-      this.$refs[formName].resetFields();
-      this.defaultMsg = "";
+    resetForm() {
+      this.ruleForm.category_name="";
+      this.ruleForm.category_code=""
+      this.ruleForm.title=""
+      this.ruleForm.show_time=""
+      this.ruleForm.picture_url=""
+      this.ruleForm.essay_status=0;
+      this.ruleForm.content=""
+      this.$refs.ue.editor.setContent("")
     },
     getUEContent() {
       let content = this.$refs.ue.getUEContent();
       this.ruleForm.content = content;
-      // this.$notify({
-      //   title: "获取成功，可在控制台查看！",
-      //   message: content,
-      //   type: "success"
-      // });
-      //console.log(this.ruleForm.desc);
     },
     handleRemove(file, fileList) {
       console.log(file, fileList);

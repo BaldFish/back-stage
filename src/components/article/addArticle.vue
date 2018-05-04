@@ -6,7 +6,7 @@
     <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm" size="medium">
       <el-form-item label="类型：" prop="category_code">
         <el-select v-model="ruleForm.category_code" placeholder="请选择文章类型" style="width: 200px;" @change="changeValue">
-          <el-option v-for="(item,index) of article_type" :label=item.Name :value=item.Code :key="item.Code" ></el-option>
+          <el-option v-for="(item,index) of article_type" :label=item.category_name :value=item.category_code :key="item.category_code" ></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="文章标题：" prop="title">
@@ -129,9 +129,9 @@ export default {
     changeValue(){
       var that=this;
       var select_article_type=_.find(this.article_type,function (o) {
-        return o.Code===that.ruleForm.category_code
+        return o.category_code===that.ruleForm.category_code
       });
-      this.ruleForm.category_name=select_article_type.Name;
+      this.ruleForm.category_name=select_article_type.category_name;
     },
     getImgUrl() {
       this.select_imgUrl = event.target.src;
@@ -203,10 +203,11 @@ export default {
     axios({
       method: "GET",
       url:
-        "http://wallet-api-test.launchain.org:50000/v1/resource/search?type=essay_type"
+        "http://wallet-api-test.launchain.org:50000/v1/essay-catg/all"
     })
       .then(res => {
-        this.article_type = res.data.info;
+        this.article_type = res.data;
+        console.log(this.article_type)
       })
       .catch(error => {
         this.article_type = [];

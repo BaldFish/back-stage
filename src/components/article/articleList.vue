@@ -4,7 +4,7 @@
       <h3>文章管理</h3>
       <span>分类：</span>
       <el-select v-model="value4" clearable placeholder="请选择">
-        <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+        <el-option v-for="item in article_type" :key="item.category_code" :label="item.category_name" :value="item.category_code">
         </el-option>
       </el-select>
       <span>名称：</span>
@@ -19,27 +19,27 @@
       </el-table-column>
       <el-table-column label="编号" width="180" style="text-align: center">
         <template slot-scope="scope">
-          <span>{{ scope.row.date }}</span>
+          <span>{{ scope.row.essay_num }}</span>
         </template>
       </el-table-column>
       <el-table-column label="文章类型" width="180">
         <template slot-scope="scope">
-          <span>{{ scope.row.name }}</span>
+          <span>{{ scope.row.category_name }}</span>
         </template>
       </el-table-column>
       <el-table-column label="文章标题" width="180">
         <template slot-scope="scope">
-          <span>{{ scope.row.address }}</span>
+          <span>{{ scope.row.title }}</span>
         </template>
       </el-table-column>
       <el-table-column label="状态" width="180">
         <template slot-scope="scope">
-          <span>{{ scope.row.name }}</span>
+          <span>{{ scope.row.essay_status===1?"有效":"无效" }}</span>
         </template>
       </el-table-column>
       <el-table-column label="发布时间" width="180">
         <template slot-scope="scope">
-          <span>{{ scope.row.name }}</span>
+          <span>{{ scope.row.show_time }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" width="180">
@@ -52,50 +52,23 @@
       </el-table-column>
     </el-table>
     <div style="margin-top: 20px">
-      <el-button @click="toggleSelection([tableData[1], tableData[2]])">新增</el-button>
+      <el-button><a href="/#/management/2-3">新增</a></el-button>
       <el-button @click="toggleSelection()">删除</el-button>
     </div>
   </div>
 </template>
 
 <script>
+  import axios from "axios";
+  import formatDate from "@/common/js/formatDate.js";
+  import _ from "lodash";
 export default {
   name: "",
   data() {
     return {
-      tableData: [
-        {
-          date: "2016-05-02",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1518 弄"
-        },
-        {
-          date: "2016-05-04",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1517 弄"
-        },
-        {
-          date: "2016-05-01",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1519 弄"
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄"
-        }
-      ],
+      tableData: [],
       multipleSelection: [],
-      options: [
-        {
-          value: "选项1",
-          label: "黄金糕"
-        },
-        {
-          value: "选项2",
-          label: "双皮奶"
-        },
-      ],
+      article_type:[],
       value4: "",
       options4: [],
       value9: [],
@@ -155,10 +128,34 @@ export default {
       ]
     };
   },
-  mounted: function() {
-    this.list = this.states.map(item => {
-      return { value: item, label: item };
-    });
+  mounted(){
+      this.list = this.states.map(item => {return { value: item, label: item };});
+    //获取下拉列表文章类型
+    axios({
+      method: "GET",
+      url:
+        "http://wallet-api-test.launchain.org:50000/v1/essay-catg/all"
+    })
+      .then(res => {
+        this.article_type = res.data;
+        console.log(this.article_type)
+      })
+      .catch(error => {
+        this.article_type = [];
+      });
+    //获取文章列表
+    axios({
+      method: "GET",
+      url:
+        "http://wallet-api-test.launchain.org:50000/v1/essay?page=0&limit=10000"
+    })
+      .then(res => {
+        this.tableData = res.data.info;
+        console.log(this.tableData)
+      })
+      .catch(error => {
+        this.tableData = [];
+      });
   },
   methods: {
     handleEdit(index, row) {

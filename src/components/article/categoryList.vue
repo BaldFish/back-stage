@@ -7,23 +7,19 @@
         <el-table :data="tableData" style="width: 100%">
           <el-table-column type="selection">
           </el-table-column>
-          <el-table-column prop="Num" label="编号" width="120">
+          <el-table-column prop="essay_category_num" label="编号" width="120">
           </el-table-column>
-          <el-table-column prop="Name" label="分类名称" width="200">
+          <el-table-column prop="category_name" label="分类名称" width="200">
           </el-table-column>
-          <el-table-column prop="TypeName" label="文章类型" width="200">
+          <el-table-column prop="type_name" label="文章类型" width="200">
           </el-table-column>
           <el-table-column label="操作">
-            <template scope="scope">
+            <template slot-scope="scope">
               <el-button type="primary" size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
               <el-button type="danger" size="small" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
-        <!--<div class="block">-->
-          <!--<el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage" :page-size="100" layout="prev, pager, next, jumper" :total="1000">-->
-          <!--</el-pagination>-->
-        <!--</div>-->
       </el-col>
       <el-col style="margin-top: 20px">
         <el-button type="primary" @click="dialogFormVisible = true">新增</el-button>
@@ -33,13 +29,13 @@
     <el-dialog title="修改类型信息" :visible.sync="dialogFormVisible">
       <el-form ref="form" :model="form" label-width="80px">
         <el-form-item label="编号">
-          <el-input v-model="form.Num"></el-input>
+          <el-input v-model="form.essay_category_num"></el-input>
         </el-form-item>
         <el-form-item label="分类名称">
-          <el-input v-model="form.Name"></el-input>
+          <el-input v-model="form.category_name"></el-input>
         </el-form-item>
         <el-form-item label="文章类型">
-          <el-input v-model="form.TypeName"></el-input>
+          <el-input v-model="form.type_name"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleSave" :loading="editLoading">确定</el-button>
@@ -63,9 +59,9 @@
         dialogFormVisible: false,
         editLoading: false,
         form: {
-          Num: "",
-          Name: "",
-          TypeName: ""
+          essay_category_num: "",
+          category_name: "",
+          type_name: ""
         },
         currentPage: 4,
         table_index: 999
@@ -75,7 +71,7 @@
       axios({
         method: "GET",
         url:
-          "http://wallet-api-test.launchain.org:50000/v1/resource/search?type=essay_type"
+          "http://wallet-api-test.launchain.org:50000/v1/essay-catg?page=0&limit=10"
       })
         .then(res => {
           this.tableData = res.data.info;
@@ -90,6 +86,8 @@
         this.$message("模拟数据，这个方法并不管用哦~");
       },
       handleDelete(index, row) {
+        console.log(index)
+        console.log(row)
         this.tableData.splice(index, 1);
         this.$message({
           message: "操作成功！",
@@ -110,6 +108,7 @@
           .then(() => {
             this.editLoading = true;
             let date = this.form.date;
+            console.log(date);
             if (typeof date === "object") {
               date = [
                 date.getFullYear(),

@@ -22,24 +22,39 @@
         </el-table>
       </el-col>
       <el-col style="margin-top: 20px">
-        <el-button type="primary" @click="dialogFormVisible = true">新增</el-button>
-        <el-button @click="dialogFormVisible = false">删除</el-button>
+        <el-button type="primary" @click="addType">新增</el-button>
+        <el-button @click="">删除</el-button>
       </el-col>
     </el-row>
     <el-dialog title="修改类型信息" :visible.sync="dialogFormVisible">
       <el-form ref="form" :model="form" label-width="80px">
-        <el-form-item label="编号">
-          <el-input v-model="form.essay_category_num"></el-input>
-        </el-form-item>
         <el-form-item label="分类名称">
           <el-input v-model="form.category_name"></el-input>
         </el-form-item>
         <el-form-item label="文章类型">
-          <el-input v-model="form.type_name"></el-input>
+          <el-select v-model="form.type_name" placeholder="请选择文章类型" style="width: 200px;" @change="changeValue">
+            <el-option v-for="(item,index) of selectData" :label=item.Name :value=item.Name :key="item.Code" ></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleSave" :loading="editLoading">确定</el-button>
+          <el-button type="primary" @click="editHandleSave" :loading="editLoading">确定</el-button>
           <el-button @click="dialogFormVisible = false">取消</el-button>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
+    <el-dialog title="新增类型信息" :visible.sync="addFormVisible">
+      <el-form ref="form_add" :model="form_add" label-width="80px">
+        <el-form-item label="分类名称">
+          <el-input v-model="form_add.category_name"></el-input>
+        </el-form-item>
+        <el-form-item label="文章类型">
+          <el-select v-model="form_add.type_name" placeholder="请选择文章类型" style="width: 200px;" @change="addChangeValue">
+            <el-option v-for="(item,index) of selectData" :label=item.Name :value=item.Name :key="item.Code" ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="addHandleSave" :loading="editLoading">确定</el-button>
+          <el-button @click="addFormVisible = false">取消</el-button>
         </el-form-item>
       </el-form>
     </el-dialog>
@@ -54,20 +69,29 @@
     data() {
       return {
         tableData: [],
+        selectData:[],
         options: [],
         places: [],
         dialogFormVisible: false,
+        addFormVisible:false,
         editLoading: false,
         form: {
-          essay_category_num: "",
-          category_name: "",
-          type_name: ""
+          category_name:"",
+          category_code:"",
+          type_name:"",
+          type_code:"",
+          catg_status:"",
         },
-        currentPage: 4,
+        form_add: {
+          category_name:"",
+          type_name:"",
+          type_code:"",
+        },
         table_index: 999
       };
     },
     created() {
+      //获取分类列表
       axios({
         method: "GET",
         url:
@@ -80,14 +104,73 @@
         .catch(error => {
           this.tableData = [];
         });
+      //获取新增、编辑弹出框下拉列表
+      axios({
+        method: "GET",
+        url:
+          "http://wallet-api-test.launchain.org:50000/v1/resource/search?type=essay_type"
+      })
+        .then(res => {
+          this.selectData = res.data.info;
+        })
+        .catch(error => {
+          this.selectData = [];
+        });
     },
     methods: {
-      onSubmit() {
-        this.$message("模拟数据，这个方法并不管用哦~");
+      addType(){
+        this.form_add= {
+          category_name: "",
+            type_name: "",
+            type_code: ""
+        };
+        this.addFormVisible = true;
+      },
+      addHandleSave(){
+        this.$confirm("确认提交吗？", "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          cancelButtonClass: "cancel"
+        })
+          .then(() => {
+            this.editLoading = true;
+            var token=JSON.parse(sessionStorage.myLogin).token
+            var data="category_name="+this.form_add.category_name+"&type_name="+this.form_add.type_name+"&type_code="+this.form_add.type_code
+            console.log(data)
+            axios({
+              method: "POST",
+              url:
+              "http://wallet-api-test.launchain.org:50000/v1/essay-catg",
+              data:data,
+              headers:{
+                "Content-Type":"application/x-www-form-urlencoded",
+                "X-Access-Token":token
+              }
+            }).then((res)=>{
+              console.log(res)
+              // this.tableData.splice(this.table_index, 1, this.form);
+              // this.editLoading = false;
+              // this.addFormVisible = false;
+              // this.$message({
+              //   message: "操作成功！",
+              //   type: "success"
+              // });
+            }).catch(err=>{
+              console.log(err)
+            });
+          })
+          .catch(() => {});
+      },
+      addChangeValue(){
+        var that=this;
+        var addSelect=_.find(this.selectData,function (o) {
+          return o.Name===that.form_add.type_name
+        });
+        this.form_add.type_code=addSelect.Code;
+        console.log(this.form_add)
       },
       handleDelete(index, row) {
-        console.log(index)
-        console.log(row)
+        axios({}).then().catch()
         this.tableData.splice(index, 1);
         this.$message({
           message: "操作成功！",
@@ -99,7 +182,14 @@
         this.form = Object.assign({}, row);
         this.table_index = index;
       },
-      handleSave() {
+      changeValue(){
+        var that=this;
+        var editSelect=_.find(this.selectData,function (o) {
+          return o.Name===that.form.type_name
+        });
+        this.form.type_code=editSelect.Code;
+      },
+      editHandleSave() {
         this.$confirm("确认提交吗？", "提示", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
@@ -107,34 +197,35 @@
         })
           .then(() => {
             this.editLoading = true;
-            let date = this.form.date;
-            console.log(date);
-            if (typeof date === "object") {
-              date = [
-                date.getFullYear(),
-                date.getMonth() + 1,
-                date.getDate()
-              ].join("-");
-              this.form.date = date;
-            }
-            //          this.tableData[this.table_index] = this.form;
-            this.tableData.splice(this.table_index, 1, this.form);
-            this.$message({
-              message: "操作成功！",
-              type: "success"
+            var id=this.form._id;
+            var token=JSON.parse(sessionStorage.myLogin).token
+            var data={}
+            data.category_name=this.form.category_name
+            data.category_code=this.form.category_code
+            data.type_name=this.form.type_name
+            data.type_code=this.form.type_code
+            data.catg_status=this.form.catg_status
+            axios({
+              method: "PUT",
+              url:
+                "http://wallet-api-test.launchain.org:50000/v1/essay-catg/"+id,
+              data:data,
+              headers:{
+                "Content-Type":"application/json",
+                "X-Access-Token":token
+              }
+            }).then((res)=>{
+              this.tableData.splice(this.table_index, 1, this.form);
+              this.editLoading = false;
+              this.dialogFormVisible = false;
+              this.$message({
+                message: "操作成功！",
+                type: "success"
+              });
             });
-            this.editLoading = false;
-            this.dialogFormVisible = false;
           })
           .catch(() => {});
       },
-      handleSizeChange(val) {
-        console.log(`每页 ${val} 条`);
-      },
-      handleCurrentChange(val) {
-        this.currentPage = val;
-        console.log(`当前页: ${val}`);
-      }
     }
   };
 </script>

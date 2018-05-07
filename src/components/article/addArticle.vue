@@ -198,7 +198,6 @@ export default {
   },
   mounted() {
     this.token=JSON.parse(sessionStorage.myLogin).token;
-    //console.log(this.token);
     //获取下拉列表文章类型
     axios({
       method: "GET",
@@ -207,7 +206,6 @@ export default {
     })
       .then(res => {
         this.article_type = res.data;
-        console.log(this.article_type)
       })
       .catch(error => {
         this.article_type = [];

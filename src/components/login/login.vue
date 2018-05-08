@@ -35,9 +35,7 @@
 <script>
 import axios from "axios";
 import _ from "lodash";
-
-var codeURL = "http://wallet-api-test.launchain.org:50000/v1/captcha";
-var registerURL = "http://wallet-api-test.launchain.org:50000/v1/mgt/session";
+import {baseURL} from '@/common/js/public.js';
 export default {
   name: "login",
   data() {
@@ -64,7 +62,7 @@ export default {
     getCode: function() {
       axios({
         method: "post",
-        url: codeURL,
+        url: `${baseURL}/v1/captcha`,
         data: this.pngSize
       }).then(res => {
         this.pngInfo = "data:image/png;base64," + res.data.png;
@@ -103,7 +101,7 @@ export default {
           that.formLabelAlign.code;
         axios({
           method: "post",
-          url: registerURL,
+          url: `${baseURL}/v1/mgt/session`,
           contentType: "application/x-www-form-urlencoded",
           data: registerInfo
         })

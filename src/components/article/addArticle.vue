@@ -75,6 +75,7 @@ import UE from "../../components/ue/ue.vue";
 import axios from "axios";
 import formatDate from "@/common/js/formatDate.js";
 import _ from "lodash";
+import {baseURL} from '@/common/js/public.js';
 export default {
   components: { UE },
   data() {
@@ -114,7 +115,7 @@ export default {
         essay_status: [
           { required: true, message: "请选择状态", trigger: "change" }
         ],
-        content: [{ required: true, message: "请填写内容", trigger: "blur" }]
+        content: [{ required: true, message: "请填写内容", trigger: "blur" },{ min: 1, message: "长度在 1 到 50 个字符", trigger: "blur" }]
       },
       defaultMsg: "",
       config: {
@@ -122,7 +123,7 @@ export default {
         initialFrameHeight: 350
       },
       dialogImageUrl: "",
-      dialogVisible: false
+      dialogVisible: false,
     };
   },
   methods: {
@@ -148,19 +149,24 @@ export default {
             data="category_name="+this.ruleForm.category_name+"&category_code="+this.ruleForm.category_code+"&title="+this.ruleForm.title+"&show_time="+this.ruleForm.show_time+"&picture_url="+this.ruleForm.picture_url+"&essay_status="+this.ruleForm.essay_status+"&content="+this.ruleForm.content;
           axios({
             method:'post',
-            url: "http://wallet-api-test.launchain.org:50000/v1/essay",
+            url: `${baseURL}/v1/essay`,
             headers:{
               'Content-Type': 'application/x-www-form-urlencoded',
               'X-Access-Token':this.token,
             },
             data:data,
           }).then(res=>{
+            this.ruleForm.show_time=""
             this.$layer.alert("新增成功！", {
               shadeClose: false,
               title: "提示框"
             });
+          }).catch(err=>{
+            this.ruleForm.show_time="";
+            
           })
         } else {
+          this.ruleForm.show_time=""
           this.$layer.alert("新增失败！", {
             shadeClose: false,
             title: "提示框"
@@ -202,7 +208,7 @@ export default {
     axios({
       method: "GET",
       url:
-        "http://wallet-api-test.launchain.org:50000/v1/essay-catg/all"
+        `${baseURL}/v1/essay-catg/all`
     })
       .then(res => {
         this.article_type = res.data;
@@ -213,7 +219,7 @@ export default {
     //获取服务器图片列表
     axios({
       method: "GET",
-      url: "http://wallet-api-test.launchain.org:50000/v1/file/search?type=1"
+      url: `${baseURL}/v1/file/search?type=1`
     })
       .then(res => {
         this.img_list = res.data.info;

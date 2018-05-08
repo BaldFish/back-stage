@@ -15,7 +15,6 @@ export default new Router({
     },
     {
       path: '/management',
-      name: 'management',
       component: management,
       children: [
         {

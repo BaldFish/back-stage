@@ -21,11 +21,24 @@
           </el-table-column>
         </el-table>
       </el-col>
+    </el-row>
+    <div class="block" style="text-align:center">
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="currentPage"
+        :page-sizes="[10, 15, 20, 30]"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total=total>
+      </el-pagination>
+    </div>
+    <el-row>
       <el-col style="margin-top: 20px">
         <el-button type="primary" @click="addType">新增</el-button>
         <el-button @click="handleDeletes">删除</el-button>
       </el-col>
     </el-row>
+    
     <el-dialog title="修改类型信息" :visible.sync="dialogFormVisible">
       <el-form ref="form" :model="form" label-width="80px">
         <el-form-item label="分类名称">
@@ -70,8 +83,7 @@
   import axios from "axios";
   import formatDate from "@/common/js/formatDate.js";
   import _ from "lodash";
-  
-  const ERR_OK = "000";
+  import {baseURL} from '@/common/js/public.js';
   export default {
     data() {
       return {
@@ -96,7 +108,11 @@
           type_code: "",
           category_status: "",
         },
-        table_index: 999
+        table_index: 999,
+        page:0,
+        limit:10,
+        currentPage:1,
+        total: 20,
       };
     },
     mounted() {
@@ -105,8 +121,7 @@
       //获取新增、编辑弹出框下拉列表
       axios({
         method: "GET",
-        url:
-          "http://wallet-api-test.launchain.org:50000/v1/resource/search?type=essay_type"
+        url: `${baseURL}/v1/resource/search?type=essay_type`
       })
         .then(res => {
           this.selectData = res.data.info;
@@ -116,19 +131,26 @@
         });
     },
     methods: {
+      handleSizeChange(val) {
+        this.limit=val;
+        this.getClassifyList()
+      },
+      handleCurrentChange(val) {
+        this.page=val-1;
+        this.getClassifyList()
+      },
       handleSelectionChange(val) {
         this.multipleSelection = val;
-        // console.log(this.multipleSelection)
       },
       //获取分类列表
       getClassifyList() {
         axios({
           method: "GET",
-          url:
-            "http://wallet-api-test.launchain.org:50000/v1/essay-catg?page=0&limit=10"
+          url: `${baseURL}/v1/essay-catg?page=${this.page}&limit=${this.limit}`
         })
           .then(res => {
             this.tableData = res.data.info;
+            this.total = res.data.count
           })
           .catch(error => {
             this.tableData = [];
@@ -165,7 +187,7 @@
             this.form_add.type_code + "&category_status=" + this.form_add.category_status;
           axios({
             method: "POST",
-            url: "http://wallet-api-test.launchain.org:50000/v1/essay-catg",
+            url: `${baseURL}/v1/essay-catg`,
             data: data,
             headers: {
               "Content-Type": "application/x-www-form-urlencoded",
@@ -188,10 +210,9 @@
       },
       handleDelete(index, row) {
         var token = JSON.parse(sessionStorage.myLogin).token
-        console.log(row._id)
         axios({
           method: "DELETE",
-          url: "http://wallet-api-test.launchain.org:50000/v1/essay-catg/" + row._id,
+          url: `${baseURL}/v1/essay-catg/${row._id}`,
           headers: {
             "X-Access-Token": token
           }
@@ -214,7 +235,7 @@
         var that = this
         axios({
           method: "POST",
-          url: "http://wallet-api-test.launchain.org:50000/v1/essay-catg/delete-batch",
+          url: `${baseURL}/v1/essay-catg/delete-batch`,
           data: multipleData,
           headers: {
             "X-Access-Token": token,
@@ -258,8 +279,7 @@
           data.catg_status = this.form.catg_status
           axios({
             method: "PUT",
-            url:
-            "http://wallet-api-test.launchain.org:50000/v1/essay-catg/" + id,
+            url: `${baseURL}/v1/essay-catg/${id}`,
             data: data,
             headers: {
               "Content-Type": "application/json",

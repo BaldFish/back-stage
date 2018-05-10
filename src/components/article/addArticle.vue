@@ -145,8 +145,17 @@ export default {
             new Date(this.ruleForm.show_time),
             "yyyy-MM-dd"
           );
-          var
-            data="category_name="+this.ruleForm.category_name+"&category_code="+this.ruleForm.category_code+"&title="+this.ruleForm.title+"&show_time="+this.ruleForm.show_time+"&picture_url="+this.ruleForm.picture_url+"&essay_status="+this.ruleForm.essay_status+"&content="+this.ruleForm.content;
+          var data = {
+            category_name: this.ruleForm.category_name,
+            category_code: this.ruleForm.category_code,
+            title: this.ruleForm.title,
+            show_time: this.ruleForm.show_time,
+            picture_url: this.ruleForm.picture_url,
+            essay_status: this.ruleForm.essay_status,
+            content: this.ruleForm.content
+          };
+          /*var
+            data="category_name="+this.ruleForm.category_name+"&category_code="+this.ruleForm.category_code+"&title="+this.ruleForm.title+"&show_time="+this.ruleForm.show_time+"&picture_url="+this.ruleForm.picture_url+"&essay_status="+this.ruleForm.essay_status+"&content="+this.ruleForm.content;*/
           axios({
             method:'post',
             url: `${baseURL}/v1/essay`,

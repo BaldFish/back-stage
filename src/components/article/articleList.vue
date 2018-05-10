@@ -180,7 +180,7 @@
         })
           .then(res => {
             this.tableData = res.data.info;
-            this.total = res.data.count
+            this.total = res.data.count;
           })
           .catch(error => {
             this.tableData = [];

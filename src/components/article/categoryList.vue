@@ -13,6 +13,8 @@
           </el-table-column>
           <el-table-column prop="type_name" label="文章类型" width="200">
           </el-table-column>
+          <el-table-column prop="catg_status" label="状态" width="200">
+          </el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
               <el-button type="primary" size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
@@ -47,6 +49,12 @@
         <el-form-item label="文章类型">
           <el-select v-model="form.type_name" placeholder="请选择文章类型" style="width: 200px;" @change="changeValue">
             <el-option v-for="(item,index) of selectData" :label=item.Name :value=item.Name :key="item.Code"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="状态">
+          <el-select v-model="form.catg_status" placeholder="请选择状态" style="width: 200px;" @change="editChangeStatus">
+            <el-option label="有效" value=1></el-option>
+            <el-option label="无效" value=2></el-option>
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -150,7 +158,15 @@
         })
           .then(res => {
             this.tableData = res.data.info;
-            this.total = res.data.count
+            this.total = res.data.count;
+            this.tableData =_.map(this.tableData,function (o) {
+              if(o.catg_status===1){
+                o.catg_status="有效"
+              }else {
+                o.catg_status="无效"
+              }
+              return o
+            });
           })
           .catch(error => {
             this.tableData = [];
@@ -253,6 +269,8 @@
       handleEdit(index, row) {
         this.dialogFormVisible = true;
         this.form = Object.assign({}, row);
+        console.log(this.form)
+        console.log(index)
         this.table_index = index;
       },
       changeValue() {
@@ -261,6 +279,9 @@
           return o.Name === that.form.type_name
         });
         this.form.type_code = editSelect.Code;
+      },
+      editChangeStatus(){
+        this.form.catg_status= this.status;
       },
       editHandleSave() {
         this.$confirm("确认提交吗？", "提示", {

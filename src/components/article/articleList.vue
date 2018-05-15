@@ -4,14 +4,15 @@
       <h3>文章管理</h3>
       <span>分类：</span>
       <el-select v-model="select_value" clearable placeholder="请选择" @change="changeValue">
-        <el-option v-for="item in selectData" :key="item.category_code" :label="item.category_name" :value="item.category_code">
+        <el-option v-for="item in selectData" :key="item.category_code" :label="item.category_name" :value="item.category_name">
         </el-option>
       </el-select>
       <span>名称：</span>
-      <el-select v-model="value9" multiple filterable remote reserve-keyword placeholder="请输入关键词" :remote-method="remoteMethod" :loading="loading">
+      <el-input v-model="title" placeholder="请输入标题" clearable style="width: 220px"></el-input>
+      <!--<el-select v-model="value9" multiple filterable remote reserve-keyword placeholder="请输入关键词" :remote-method="remoteMethod" :loading="loading">
         <el-option v-for="item in options4" :key="item.value" :label="item.label" :value="item.value">
         </el-option>
-      </el-select>
+      </el-select>-->
       <el-button @click="toggleSelection()">搜索</el-button>
     </div>
     <el-table :data="tableData" style="width: 100%" ref="multipleTable" tooltip-effect="dark" @selection-change="handleSelectionChange">
@@ -56,7 +57,7 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :current-page="currentPage"
-        :page-sizes="[10, 15, 20, 30]"
+        :page-sizes="[5, 10, 20, 30]"
         layout="total, sizes, prev, pager, next, jumper"
         :total=total>
       </el-pagination>
@@ -82,64 +83,65 @@
         tableData: [],
         selectData: [],
         select_value: "",
+        title:"",
         multipleSelection: [],
         multipleDelete: [],
-        options4: [],
-        value9: [],
-        list: [],
+        // options4: [],
+        // value9: [],
+        // list: [],
         loading: false,
-        states: [
-          "Alabama",
-          "Alaska",
-          "Arizona",
-          "Arkansas",
-          "California",
-          "Colorado",
-          "Connecticut",
-          "Delaware",
-          "Florida",
-          "Georgia",
-          "Hawaii",
-          "Idaho",
-          "Illinois",
-          "Indiana",
-          "Iowa",
-          "Kansas",
-          "Kentucky",
-          "Louisiana",
-          "Maine",
-          "Maryland",
-          "Massachusetts",
-          "Michigan",
-          "Minnesota",
-          "Mississippi",
-          "Missouri",
-          "Montana",
-          "Nebraska",
-          "Nevada",
-          "New Hampshire",
-          "New Jersey",
-          "New Mexico",
-          "New York",
-          "North Carolina",
-          "North Dakota",
-          "Ohio",
-          "Oklahoma",
-          "Oregon",
-          "Pennsylvania",
-          "Rhode Island",
-          "South Carolina",
-          "South Dakota",
-          "Tennessee",
-          "Texas",
-          "Utah",
-          "Vermont",
-          "Virginia",
-          "Washington",
-          "West Virginia",
-          "Wisconsin",
-          "Wyoming"
-        ],
+        // states: [
+        //   "Alabama",
+        //   "Alaska",
+        //   "Arizona",
+        //   "Arkansas",
+        //   "California",
+        //   "Colorado",
+        //   "Connecticut",
+        //   "Delaware",
+        //   "Florida",
+        //   "Georgia",
+        //   "Hawaii",
+        //   "Idaho",
+        //   "Illinois",
+        //   "Indiana",
+        //   "Iowa",
+        //   "Kansas",
+        //   "Kentucky",
+        //   "Louisiana",
+        //   "Maine",
+        //   "Maryland",
+        //   "Massachusetts",
+        //   "Michigan",
+        //   "Minnesota",
+        //   "Mississippi",
+        //   "Missouri",
+        //   "Montana",
+        //   "Nebraska",
+        //   "Nevada",
+        //   "New Hampshire",
+        //   "New Jersey",
+        //   "New Mexico",
+        //   "New York",
+        //   "North Carolina",
+        //   "North Dakota",
+        //   "Ohio",
+        //   "Oklahoma",
+        //   "Oregon",
+        //   "Pennsylvania",
+        //   "Rhode Island",
+        //   "South Carolina",
+        //   "South Dakota",
+        //   "Tennessee",
+        //   "Texas",
+        //   "Utah",
+        //   "Vermont",
+        //   "Virginia",
+        //   "Washington",
+        //   "West Virginia",
+        //   "Wisconsin",
+        //   "Wyoming"
+        // ],
         currentPage: 1,
         total: 20,
         page: 0,
@@ -147,9 +149,9 @@
       };
     },
     mounted() {
-      this.list = this.states.map(item => {
-        return {value: item, label: item};
-      });
+      // this.list = this.states.map(item => {
+      //   return {value: item, label: item};
+      // });
       //获取下拉列表文章类型
       axios({
         method: "GET",
@@ -235,31 +237,47 @@
         }).catch((err) => {
         })
       },
-      toggleSelection(rows) {
-        if (rows) {
-          rows.forEach(row => {
-            this.$refs.multipleTable.toggleRowSelection(row);
+      toggleSelection() {
+        if(this.select_value===""&&this.title!==""){
+          this.$layer.alert("请选择搜索类型！", {
+            shadeClose: false,
+            title: "提示框"
           });
-        } else {
-          this.$refs.multipleTable.clearSelection();
+          return;
+        }else if(this.select_value===""&&this.title===""){
+          this.getArticleList()
+        }else{
+          axios({
+            method: "GET",
+            url: `${baseURL}/v1/essay/search?page=${this.page}&limit=${this.limit}&category_name=${this.select_value}&title=${this.title}`
+          })
+            .then(res => {
+              console.log(res.data.info)
+              this.tableData = res.data.info;
+              this.total = res.data.count;
+            })
+            .catch(error => {
+              this.tableData = [];
+            });
         }
+        
       },
       handleSelectionChange(val) {
         this.multipleSelection = val;
       },
-      remoteMethod(query) {
-        if (query !== "") {
-          this.loading = true;
-          setTimeout(() => {
-            this.loading = false;
-            this.options4 = this.list.filter(item => {
-              return item.label.toLowerCase().indexOf(query.toLowerCase()) > -1;
-            });
-          }, 200);
-        } else {
-          this.options4 = [];
-        }
-      }
+      // remoteMethod(query) {
+      //   if (query !== "") {
+      //     this.loading = true;
+      //     setTimeout(() => {
+      //       this.loading = false;
+      //       this.options4 = this.list.filter(item => {
+      //         return item.label.toLowerCase().indexOf(query.toLowerCase()) > -1;
+      //       });
+      //     }, 200);
+      //   } else {
+      //     this.options4 = [];
+      //   }
+      // }
     }
   };
 </script>

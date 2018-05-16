@@ -143,7 +143,7 @@
         //   "Wyoming"
         // ],
         currentPage: 1,
-        total: 20,
+        total: 10,
         page: 0,
         limit: 10
       };
@@ -169,11 +169,31 @@
     methods: {
       handleSizeChange(val) {
         this.limit=val
-        this.getArticleList()
+        if(this.select_value===""&&this.title!==""){
+          this.$layer.alert("请选择搜索类型！", {
+            shadeClose: false,
+            title: "提示框"
+          });
+          return;
+        }else if(this.select_value===""&&this.title===""){
+          this.getArticleList()
+        }else{
+          this.searchArticleList()
+        }
       },
       handleCurrentChange(val) {
-        this.page=val-1
-        this.getArticleList()
+        this.page=val-1;
+        if(this.select_value===""&&this.title!==""){
+          this.$layer.alert("请选择搜索类型！", {
+            shadeClose: false,
+            title: "提示框"
+          });
+          return;
+        }else if(this.select_value===""&&this.title===""){
+          this.getArticleList()
+        }else{
+          this.searchArticleList()
+        }
       },
       getArticleList() {
         axios({
@@ -188,8 +208,25 @@
             this.tableData = [];
           });
       },
+      searchArticleList(){
+        axios({
+          method: "GET",
+          url: `${baseURL}/v1/essay/search?page=${this.page}&limit=${this.limit}&category_name=${this.select_value}&title=${this.title}`
+        })
+          .then(res => {
+            this.tableData = res.data.info;
+            this.total = res.data.count;
+          })
+          .catch(error => {
+            this.tableData = [];
+          });
+      },
       changeValue() {
-        console.log(this.select_value)
+        this.toggleSelection()
+        // console.log(this.page)
+        // console.log(this.currentPage)
+        // console.log(this.select_value)
+        
       },
       handleEdit(index, row) {
         console.log(index, row);
@@ -247,20 +284,9 @@
         }else if(this.select_value===""&&this.title===""){
           this.getArticleList()
         }else{
-          axios({
-            method: "GET",
-            url: `${baseURL}/v1/essay/search?page=${this.page}&limit=${this.limit}&category_name=${this.select_value}&title=${this.title}`
-          })
-            .then(res => {
-              console.log(res.data.info)
-              this.tableData = res.data.info;
-              this.total = res.data.count;
-            })
-            .catch(error => {
-              this.tableData = [];
-            });
+          this.page=0;
+          this.searchArticleList()
         }
-        
       },
       handleSelectionChange(val) {
         this.multipleSelection = val;

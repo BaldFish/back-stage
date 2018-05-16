@@ -269,8 +269,6 @@
       handleEdit(index, row) {
         this.dialogFormVisible = true;
         this.form = Object.assign({}, row);
-        console.log(this.form)
-        console.log(index)
         this.table_index = index;
       },
       changeValue() {
@@ -281,7 +279,7 @@
         this.form.type_code = editSelect.Code;
       },
       editChangeStatus(){
-        this.form.catg_status= this.status;
+      
       },
       editHandleSave() {
         this.$confirm("确认提交吗？", "提示", {
@@ -297,7 +295,7 @@
           data.category_code = this.form.category_code
           data.type_name = this.form.type_name
           data.type_code = this.form.type_code
-          data.catg_status = this.form.catg_status
+          data.catg_status =Number(this.form.catg_status)
           axios({
             method: "PUT",
             url: `${baseURL}/v1/essay-catg/${id}`,
@@ -307,6 +305,11 @@
               "X-Access-Token": token
             }
           }).then((res) => {
+            if(this.form.catg_status==="1"){
+              this.form.catg_status="有效"
+            }else{
+              this.form.catg_status="无效"
+            }
             this.tableData.splice(this.table_index, 1, this.form);
             this.editLoading = false;
             this.dialogFormVisible = false;
@@ -316,7 +319,7 @@
             });
           });
         })
-          .catch(() => {
+          .catch((err) => {
           });
       },
     }

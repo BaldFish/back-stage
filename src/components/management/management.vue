@@ -5,7 +5,7 @@
         <el-container>
           <el-header class="el-header">
             <el-dropdown trigger="click" class="">
-              <el-button type="primary">用户名
+              <el-button type="primary">{{userName}}
                 <i class="el-icon-arrow-down el-icon--right"></i>
               </el-button>
               <el-dropdown-menu slot="dropdown">
@@ -62,46 +62,71 @@
 </template>
 
 <script>
-export default {
-  name: "management",
-  data() {
-    return {
-      isCollapse: false
-    };
-  },
-  methods: {
-    handleOpen(key, keyPath) {
-      // console.log(key, keyPath);
+  import axios from "axios";
+  import {baseURL} from '@/common/js/public.js';
+  
+  export default {
+    name: "management",
+    data() {
+      return {
+        isCollapse: false,
+        userName: "用户名",
+      };
     },
-    handleClose(key, keyPath) {
-      // console.log(key, keyPath);
+    mounted() {
+      this.getUserInfo()
+    },
+    methods: {
+      getUserInfo() {
+        var user_id = JSON.parse(sessionStorage.getItem("myLogin")).user_id;
+        var token = JSON.parse(sessionStorage.myLogin).token;
+        axios({
+          method: "GET",
+          url: `${baseURL}/v1/mgt/user/${user_id}`,
+          headers: {
+            "Content-Type": "application/json",
+            "X-Access-Token": token
+          }
+        }).then((res) => {
+          this.userName = res.data.user_name
+        }).catch((err) => {
+          console.log(err)
+        })
+      },
+      handleOpen(key, keyPath) {
+        // console.log(key, keyPath);
+      },
+      handleClose(key, keyPath) {
+        // console.log(key, keyPath);
+      }
     }
-  }
-};
+  };
 </script>
 
 <style scoped lang="stylus">
-  a{
+  a {
     color #303133
   }
-  a.router-link-active{
+  
+  a.router-link-active {
     color #409EFF
     text-decoration: none;
   }
-.el-header {
-  text-align: right;
-}
-
-.el-dropdown {
-  vertical-align: top;
-  margin-top: 10px;
-}
-
-.el-dropdown + .el-dropdown {
-  margin-left: 15px;
-}
-
-.el-icon-arrow-down {
-  font-size: 12px;
-}
+  
+  .el-header {
+    text-align: right;
+  }
+  
+  .el-dropdown {
+    vertical-align: top;
+    margin-top: 10px;
+  }
+  
+  .el-dropdown + .el-dropdown {
+    margin-left: 15px;
+  }
+  
+  .el-icon-arrow-down {
+    font-size: 12px;
+  }
 </style>

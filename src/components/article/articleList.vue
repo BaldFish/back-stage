@@ -4,7 +4,7 @@
       <h3>文章管理</h3>
       <span>分类：</span>
       <el-select v-model="select_value" clearable placeholder="请选择" @change="changeValue">
-        <el-option v-for="item in selectData" :key="item.category_code" :label="item.category_name" :value="item.category_name">
+        <el-option v-for="item in selectData" :key="item.category_code" :label="item.category_name" :value="item.essay_category_num">
         </el-option>
       </el-select>
       <span>名称：</span>
@@ -56,7 +56,8 @@
       <el-pagination
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
-        :current-page="currentPage"
+        :current-page.sync="currentPage"
+        :page-size=5
         :page-sizes="[5, 10, 20, 30]"
         layout="total, sizes, prev, pager, next, jumper"
         :total=total>
@@ -145,7 +146,7 @@
         currentPage: 1,
         total: 10,
         page: 0,
-        limit: 10
+        limit: 5
       };
     },
     mounted() {
@@ -168,21 +169,14 @@
     },
     methods: {
       handleSizeChange(val) {
-        this.limit=val
-        if(this.select_value===""&&this.title!==""){
-          this.$layer.alert("请选择搜索类型！", {
-            shadeClose: false,
-            title: "提示框"
-          });
-          return;
-        }else if(this.select_value===""&&this.title===""){
-          this.getArticleList()
-        }else{
-          this.searchArticleList()
-        }
+        this.limit=val;
+        this.getArticleList()
       },
       handleCurrentChange(val) {
         this.page=val-1;
+        this.getArticleList()
+      },
+      getArticleList() {
         if(this.select_value===""&&this.title!==""){
           this.$layer.alert("请选择搜索类型！", {
             shadeClose: false,
@@ -190,43 +184,35 @@
           });
           return;
         }else if(this.select_value===""&&this.title===""){
-          this.getArticleList()
+          axios({
+            method: "GET",
+            url: `${baseURL}/v1/essay?page=${this.page}&limit=${this.limit}&essay_catg=${this.select_value}`
+          })
+            .then(res => {
+              this.tableData = res.data.info;
+              this.total = res.data.count;
+            })
+            .catch(error => {
+              this.tableData = [];
+            });
         }else{
-          this.searchArticleList()
+          axios({
+            method: "GET",
+            url: `${baseURL}/v1/essay/search?page=${this.page}&limit=${this.limit}&essay_catg=${this.select_value}&title=${this.title}`
+          })
+            .then(res => {
+              this.tableData = res.data.info;
+              this.total = res.data.count;
+            })
+            .catch(error => {
+              this.tableData = [];
+            });
         }
       },
-      getArticleList() {
-        axios({
-          method: "GET",
-          url: `${baseURL}/v1/essay?page=${this.page}&limit=${this.limit}`
-        })
-          .then(res => {
-            this.tableData = res.data.info;
-            this.total = res.data.count;
-          })
-          .catch(error => {
-            this.tableData = [];
-          });
-      },
-      searchArticleList(){
-        axios({
-          method: "GET",
-          url: `${baseURL}/v1/essay/search?page=${this.page}&limit=${this.limit}&category_name=${this.select_value}&title=${this.title}`
-        })
-          .then(res => {
-            this.tableData = res.data.info;
-            this.total = res.data.count;
-          })
-          .catch(error => {
-            this.tableData = [];
-          });
-      },
       changeValue() {
-        this.toggleSelection()
-        // console.log(this.page)
-        // console.log(this.currentPage)
-        // console.log(this.select_value)
-        
+        this.page=0;
+        this.currentPage=1;
+        this.getArticleList()
       },
       handleEdit(index, row) {
         console.log(index, row);
@@ -273,20 +259,6 @@
           });
         }).catch((err) => {
         })
-      },
-      toggleSelection() {
-        if(this.select_value===""&&this.title!==""){
-          this.$layer.alert("请选择搜索类型！", {
-            shadeClose: false,
-            title: "提示框"
-          });
-          return;
-        }else if(this.select_value===""&&this.title===""){
-          this.getArticleList()
-        }else{
-          this.page=0;
-          this.searchArticleList()
-        }
       },
       handleSelectionChange(val) {
         this.multipleSelection = val;

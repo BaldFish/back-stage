@@ -120,7 +120,7 @@ export default {
       defaultMsg: "",
       config: {
         initialFrameWidth: null,
-        initialFrameHeight: 350
+        initialFrameHeight: 350,
       },
       dialogImageUrl: "",
       dialogVisible: false,

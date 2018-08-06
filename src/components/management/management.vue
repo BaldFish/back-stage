@@ -29,8 +29,12 @@
                   <span slot="title">系统管理</span>
                 </template>
                 <el-menu-item-group>
-                  <el-menu-item index="1-1">广告设置</el-menu-item>
-                  <el-menu-item index="1-2">选项2</el-menu-item>
+                  <el-menu-item index="1-1">
+                    <router-link to="/systemManagement/1-1">广告设置</router-link>
+                  </el-menu-item>
+                  <el-menu-item index="1-2">
+                    <router-link to="/systemManagement/1-2">新增轮播</router-link>
+                  </el-menu-item>
                 </el-menu-item-group>
               </el-submenu>
               <el-submenu index="2">
@@ -64,7 +68,7 @@
 <script>
   import axios from "axios";
   import {baseURL} from '@/common/js/public.js';
-  
+
   export default {
     name: "management",
     data() {
@@ -107,25 +111,25 @@
   a {
     color #303133
   }
-  
+
   a.router-link-active {
     color #409EFF
     text-decoration: none;
   }
-  
+
   .el-header {
     text-align: right;
   }
-  
+
   .el-dropdown {
     vertical-align: top;
     margin-top: 10px;
   }
-  
+
   .el-dropdown + .el-dropdown {
     margin-left: 15px;
   }
-  
+
   .el-icon-arrow-down {
     font-size: 12px;
   }

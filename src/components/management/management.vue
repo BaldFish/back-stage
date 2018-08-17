@@ -32,9 +32,9 @@
                   <el-menu-item index="1-1">
                     <router-link to="/systemManagement/1-1">广告设置</router-link>
                   </el-menu-item>
-                  <el-menu-item index="1-2">
+                 <!-- <el-menu-item index="1-2">
                     <router-link to="/systemManagement/1-2">新增轮播</router-link>
-                  </el-menu-item>
+                  </el-menu-item>-->
                 </el-menu-item-group>
               </el-submenu>
               <el-submenu index="2">

@@ -13,7 +13,6 @@
           </el-table-column>
           <el-table-column prop="show_type_value" label="显示类型" width="150"
           :filters="selectData"
-          :filter-method="filterHandler"
           column-key="_id">
           </el-table-column>
           <el-table-column prop="rank" label="排序" width="150">
@@ -107,32 +106,30 @@
         this.multipleSelection = val;
       },
       //显示类型下拉筛选
-      filterHandler(value, row, column) {
-
-        /*const property = column['property'];
-        return row[property] === value;*/
-
-      },
       handleFilterChange(filters){
-     /*   this.tableData = [];
-        axios({
-          method: "GET",
-          url: `${baseURL}/v1/broadcast/s?type_id=${filters._id[0]}`
-        }).then(res => {
-          this.tableData = res.data;
-          this.total = res.data.count;
-          this.tableData =_.map(this.tableData,function (o) {
-            if(o.bc_status===1){
-              o.bc_status="有效"
-            }else {
-              o.bc_status="无效"
-            }
-            return o
-          });
-        })
-          .catch(error => {
-            this.tableData = [];
-          });*/
+        this.tableData = [];
+        if(filters._id[0]){
+          axios({
+            method: "GET",
+            url: `${baseURL}/v1/broadcast/s?type_id=${filters._id[0]}`
+          }).then(res => {
+            this.tableData = res.data;
+            this.total = res.data.count;
+            this.tableData =_.map(this.tableData,function (o) {
+              if(o.bc_status===1){
+                o.bc_status="有效"
+              }else {
+                o.bc_status="无效"
+              }
+              return o
+            });
+          })
+            .catch(error => {
+              this.tableData = [];
+            });
+        }else {
+          this.getClassifyList()
+        }
 
       },
       //获取表格数据

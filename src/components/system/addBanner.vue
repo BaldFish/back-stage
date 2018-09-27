@@ -36,7 +36,7 @@
       <h3>显示图片</h3><br>
       <el-form-item label="上传图片:">
         <el-upload action="http://wallet-api-test.launchain.org:50000/v1/file" list-type="picture-card" :on-preview="handlePictureCardPreview"
-                   :on-remove="handleRemove" name="uploadfile">
+                   :on-remove="handleRemove" :on-success="handleAvatarSuccess" name="uploadfile">
           <i class="el-icon-plus"></i>
           <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
         </el-upload>
@@ -151,9 +151,14 @@
               },
               data: querystring.stringify(data),
             }).then(res=>{
-              this.$layer.alert("新增成功！", {
-                shadeClose: false,
-                title: "提示框"
+              this.$confirm('添加成功！是否返回轮播管理列表?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'success',
+              }).then(() => {
+                this.$router.push({path: '/systemManagement/1-1'});
+              }).catch(() => {
+
               });
             }).catch(err=>{
               console.log(err)
@@ -190,9 +195,14 @@
               },
               data: data,
             }).then(res=>{
-              this.$layer.alert("修改成功！", {
-                shadeClose: false,
-                title: "提示框"
+              this.$confirm('修改成功！是否返回轮播管理列表?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'success',
+              }).then(() => {
+                this.$router.push({path: '/systemManagement/1-1'});
+              }).catch(() => {
+
               });
             }).catch(err=>{
               console.log(err)
@@ -231,6 +241,20 @@
         var e = document.getElementById("contents"); //对象是contents
         e.select(); //选择对象
         document.execCommand("Copy"); //执行浏览器复制命令
+      },
+      //图片上传成功钩子
+      handleAvatarSuccess(res, file, fileList){
+        //获取服务器图片列表
+        axios({
+          method: "GET",
+          url: `${baseURL}/v1/file/search?type=1`
+        })
+          .then(res => {
+            this.img_list = res.data.info;
+          })
+          .catch(error => {
+            this.img_list = [];
+          });
       }
     },
     mounted() {
